@@ -63,7 +63,18 @@ export default auth((req) => {
     if (role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-  } else if (pathname.startsWith("/api/cycles")) {
+  } else if (
+    pathname.startsWith("/api/cycles") &&
+    req.method !== "GET"
+  ) {
+    if (role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+  } else if (pathname.startsWith("/api/shared-goals")) {
+    if (role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+  } else if (pathname.startsWith("/api/reports/audit")) {
     if (role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
