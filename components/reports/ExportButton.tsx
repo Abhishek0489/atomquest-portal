@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
+import { toast } from "@/lib/toast";
 
 export type ExportRow = Record<string, string | number | null>;
 
@@ -30,6 +31,9 @@ export function ExportButton({
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
       XLSX.writeFile(workbook, `${filename}.xlsx`);
+      toast.success("Report exported to Excel");
+    } catch {
+      toast.error("Export failed");
     } finally {
       setExporting(false);
     }

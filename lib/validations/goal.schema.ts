@@ -7,17 +7,24 @@ export const goalFormSchema = z
   .object({
     thrustArea: z.enum(
       THRUST_AREAS as unknown as [string, ...string[]],
-      { message: "Select a thrust area" }
+      { error: "Select a thrust area" }
     ),
-    title: z.string().min(1, "Title is required").max(200),
-    description: z.string().max(2000).optional().nullable(),
-    uomType: z.enum(uomTypes),
-    target: z.number(),
+    title: z
+      .string()
+      .min(1, { error: "Title is required" })
+      .max(200, { error: "Title must be 200 characters or less" }),
+    description: z
+      .string()
+      .max(2000, { error: "Description is too long" })
+      .optional()
+      .nullable(),
+    uomType: z.enum(uomTypes, { error: "Select a unit of measure" }),
+    target: z.number({ error: "Enter a valid target" }),
     targetDate: z.string().optional().nullable(),
     weightage: z
-      .number()
-      .min(10, "Minimum weightage is 10%")
-      .max(100, "Maximum weightage is 100%"),
+      .number({ error: "Enter a valid weightage" })
+      .min(10, { error: "Minimum weightage is 10%" })
+      .max(100, { error: "Maximum weightage is 100%" }),
     submit: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {

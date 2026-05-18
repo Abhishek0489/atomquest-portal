@@ -194,9 +194,10 @@ async function main() {
     data: {
       goalId: goalApproved.id,
       period: "Q1",
-      actualValue: 750000,
+      actualValue: 950000,
       progressStatus: "ON_TRACK",
-      computedScore: 75,
+      computedScore: 95,
+      managerId: manager.id,
     },
   });
 
@@ -230,7 +231,16 @@ async function main() {
         userId: employee1.id,
         goalId: goalApproved.id,
         action: "CHECKIN_SUBMITTED",
-        details: { period: "Q1", actualValue: 750000 },
+        details: { period: "Q1", actualValue: 950000, computedScore: 95 },
+      },
+      {
+        userId: manager.id,
+        goalId: goalSubmitted.id,
+        action: "DEPENDENCY_LINKED",
+        details: {
+          dependentGoalId: goalSubmitted.id,
+          requiredGoalId: goalApproved.id,
+        },
       },
     ],
   });
@@ -242,7 +252,7 @@ async function main() {
   console.log("  GoalVersions: 2");
   console.log("  GoalDependencies: 1");
   console.log("  Checkins: 1");
-  console.log("  AuditLogs: 5");
+  console.log("  AuditLogs: 6");
 }
 
 main()

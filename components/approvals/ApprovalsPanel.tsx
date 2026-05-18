@@ -7,7 +7,9 @@ import { BulkActionBar } from "@/components/approvals/BulkActionBar";
 import { GoalReviewDialog } from "@/components/approvals/GoalReviewDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import type { PendingGoal } from "@/hooks/useManagerApprovals";
-import { CheckSquare, Loader2 } from "lucide-react";
+import { CheckSquare } from "lucide-react";
+import { toast } from "@/lib/toast";
+import { TableSkeleton } from "@/components/shared/skeletons/TableSkeleton";
 import { Label } from "@/components/ui/label";
 
 export function ApprovalsPanel() {
@@ -15,11 +17,6 @@ export function ApprovalsPanel() {
   const [thrustFilter, setThrustFilter] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [reviewGoalId, setReviewGoalId] = useState<string | null>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
-
   const { data, loading, error, refetch } = useManagerApprovals({
     employeeId: employeeFilter || undefined,
     thrustArea: thrustFilter || undefined,
@@ -55,10 +52,9 @@ export function ApprovalsPanel() {
     if (!res.ok) {
       throw new Error(body.error || "Bulk action failed");
     }
-    setMessage({
-      type: "success",
-      text: `${body.processed} goal(s) ${action === "APPROVE" ? "approved" : "returned"}.`,
-    });
+    toast.success(
+      `${body.processed} goal(s) ${action === "APPROVE" ? "approved" : "returned"}`
+    );
     setSelectedIds(new Set());
     await refetch();
   }
@@ -122,24 +118,7 @@ export function ApprovalsPanel() {
         </section>
       </section>
 
-      {message && (
-        <p
-          className={`rounded-lg px-4 py-2 text-sm ${
-            message.type === "success"
-              ? "border border-green-200 bg-green-50 text-green-800"
-              : "border border-red-200 bg-red-50 text-red-700"
-          }`}
-        >
-          {message.text}
-        </p>
-      )}
-
-      {loading && (
-        <p className="flex items-center gap-2 text-sm text-[#64748B]">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Loading pending goals...
-        </p>
-      )}
+      {loading && <TableSkeleton rows={4} columns={7} />}
 
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">

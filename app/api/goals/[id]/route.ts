@@ -197,7 +197,33 @@ export async function DELETE(_request: Request, context: RouteContext) {
     );
   }
 
-  await prisma.goal.delete({ where: { id } });
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.goalDependency.deleteMany({
+        where: {
+          OR: [{ dependentGoalId: id }, { requiredGoalId: id }],
+        },
+      });
+      await tx.goalVersion.deleteMany({ where: { goalId: id } });
+      await tx.checkin.deleteMany({ where: { goalId: id } });
+      await tx.sharedGoalRecipient.deleteMany({ where: { goalId: id } });
+      await tx.auditLog.deleteMany({ where: { goalId: id } });
+      await tx.goal.delete({ where: { id } });
+    });
 
-  return NextResponse.json({ success: true });
+    await prisma.auditLog.create({
+      data: {
+        userId: session.user.id,
+        action: "GOAL_DELETED",
+        details: { goalId: id, title: existing.title },
+      },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json(
+      { error: "Could not delete goal. Remove dependencies or try again." },
+      { status: 500 }
+    );
+  }
 }

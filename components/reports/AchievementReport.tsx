@@ -15,7 +15,8 @@ import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ExportButton } from "@/components/reports/ExportButton";
 import { formatTarget } from "@/lib/goal-labels";
-import { BarChart3, Loader2 } from "lucide-react";
+import { BarChart3 } from "lucide-react";
+import { TableSkeleton } from "@/components/shared/skeletons/TableSkeleton";
 
 type AchievementRow = {
   goalId: string;
@@ -92,12 +93,7 @@ export function AchievementReport() {
   );
 
   if (loading) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-[#64748B]">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading achievement report...
-      </p>
-    );
+    return <TableSkeleton rows={6} columns={8} />;
   }
 
   if (error) {

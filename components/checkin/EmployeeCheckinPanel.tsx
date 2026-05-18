@@ -6,25 +6,24 @@ import { CheckinForm } from "@/components/checkin/CheckinForm";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
 import { ClipboardCheck, Loader2, Save } from "lucide-react";
+import { toast } from "@/lib/toast";
+import { CardGridSkeleton } from "@/components/shared/skeletons/CardGridSkeleton";
 
 export function EmployeeCheckinPanel() {
   const { data, loading, error, refetch } = useCheckins();
   const saveFns = useRef<Record<string, () => Promise<void>>>({});
   const [savingAll, setSavingAll] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
   async function saveAll() {
     setSavingAll(true);
-    setMessage(null);
     try {
       const fns = Object.values(saveFns.current);
       for (const fn of fns) {
         await fn();
       }
-      setMessage("All check-ins saved successfully.");
+      toast.success("All check-ins saved");
       await refetch();
     } catch (e) {
-      setMessage(
+      toast.error(
         e instanceof Error ? e.message : "Some check-ins failed to save"
       );
     } finally {
@@ -62,18 +61,7 @@ export function EmployeeCheckinPanel() {
         )}
       </header>
 
-      {message && (
-        <p className="rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-800">
-          {message}
-        </p>
-      )}
-
-      {loading && (
-        <p className="flex items-center gap-2 text-sm text-[#64748B]">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Loading check-ins...
-        </p>
-      )}
+      {loading && <CardGridSkeleton count={2} columns={1} />}
 
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">

@@ -13,6 +13,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2, Loader2, RotateCcw } from "lucide-react";
+import { toast } from "@/lib/toast";
 
 type BulkActionBarProps = {
   selectedCount: number;
@@ -40,7 +41,9 @@ export function BulkActionBar({
     try {
       await onApprove();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Approval failed");
+      const msg = e instanceof Error ? e.message : "Approval failed";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(null);
     }
@@ -58,7 +61,9 @@ export function BulkActionBar({
       setReturnOpen(false);
       setComment("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Return failed");
+      const msg = e instanceof Error ? e.message : "Return failed";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(null);
     }
@@ -66,7 +71,7 @@ export function BulkActionBar({
 
   return (
     <>
-      <section className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-3 shadow-lg">
+      <section className="fixed bottom-4 left-4 right-4 z-40 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-lg sm:bottom-6 sm:left-1/2 sm:right-auto sm:w-auto sm:max-w-xl sm:-translate-x-1/2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:px-5">
         <p className="text-sm font-medium text-[#0F172A]">
           {selectedCount} goal{selectedCount !== 1 ? "s" : ""} selected
         </p>

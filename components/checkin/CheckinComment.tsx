@@ -8,6 +8,7 @@ import { ProgressScore } from "@/components/checkin/ProgressScore";
 import { formatTarget, PROGRESS_STATUS_LABELS } from "@/lib/goal-labels";
 import type { CheckinGoalItem } from "@/hooks/useCheckins";
 import { Loader2, MessageSquare } from "lucide-react";
+import { toast } from "@/lib/toast";
 
 type CheckinCommentProps = {
   item: CheckinGoalItem;
@@ -48,9 +49,12 @@ export function CheckinComment({ item, onSaved }: CheckinCommentProps) {
       if (!res.ok) {
         throw new Error(body.error || "Failed to save comment");
       }
+      toast.success("Comment saved");
       onSaved?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to save");
+      const msg = e instanceof Error ? e.message : "Failed to save";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }

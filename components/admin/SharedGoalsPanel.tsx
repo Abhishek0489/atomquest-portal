@@ -17,7 +17,9 @@ import {
 } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { formatTarget } from "@/lib/goal-labels";
-import { Share2, Loader2, Plus } from "lucide-react";
+import { Share2, Plus } from "lucide-react";
+import { toast } from "@/lib/toast";
+import { CardGridSkeleton } from "@/components/shared/skeletons/CardGridSkeleton";
 
 const UOM_OPTIONS: { value: UoMType; label: string }[] = [
   { value: "NUMERIC_MIN", label: "Numeric (higher is better)" },
@@ -93,23 +95,20 @@ export function SharedGoalsPanel() {
       }
       setCreateOpen(false);
       setSelectedRecipients(new Set());
+      toast.success("Shared goal pushed to recipients");
       refetch();
     } catch (err) {
-      setFormError(
-        err instanceof Error ? err.message : "Failed to create shared goal"
-      );
+      const msg =
+        err instanceof Error ? err.message : "Failed to create shared goal";
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
   }
 
   if (loading) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-[#64748B]">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading shared goals...
-      </p>
-    );
+    return <CardGridSkeleton count={2} columns={1} />;
   }
 
   if (error) {

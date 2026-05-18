@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Goal } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Loader2, Trash2 } from "lucide-react";
+import { toast } from "@/lib/toast";
 
 export function GoalDetailActions({ goal }: { goal: Goal }) {
   const router = useRouter();
@@ -23,10 +24,13 @@ export function GoalDetailActions({ goal }: { goal: Goal }) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || "Failed to delete");
       }
+      toast.success("Goal deleted");
       router.push("/employee/goals");
       router.refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to delete");
+      const msg = e instanceof Error ? e.message : "Failed to delete";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setDeleting(false);
     }

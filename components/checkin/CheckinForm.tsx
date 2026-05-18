@@ -9,6 +9,7 @@ import { ProgressScore } from "@/components/checkin/ProgressScore";
 import { formatTarget, PROGRESS_STATUS_LABELS } from "@/lib/goal-labels";
 import { computeScore } from "@/lib/scoring";
 import { Loader2, Save } from "lucide-react";
+import { toast } from "@/lib/toast";
 
 type CheckinFormProps = {
   goal: {
@@ -115,9 +116,12 @@ export function CheckinForm({
       if (!res.ok) {
         throw new Error(body.error || "Failed to save check-in");
       }
+      toast.success("Check-in saved");
       onSaved?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to save");
+      const msg = e instanceof Error ? e.message : "Failed to save";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }

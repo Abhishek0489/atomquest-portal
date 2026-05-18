@@ -15,11 +15,15 @@ type HeaderProps = {
 export function Header({ name, email, role }: HeaderProps) {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-6">
-      <div className="pl-12 lg:pl-0">
-        <p className="text-sm font-medium text-[#0F172A]">{name ?? "User"}</p>
-        <p className="text-xs text-[#64748B]">
+      <div className="min-w-0 pl-12 lg:pl-0">
+        <p className="truncate text-sm font-medium text-[#0F172A]">
+          {name ?? "User"}
+        </p>
+        <p className="truncate text-xs text-[#64748B]">
           {getRoleLabel(role)}
-          {email ? ` · ${email}` : ""}
+          {email ? (
+            <span className="hidden sm:inline">{` · ${email}`}</span>
+          ) : null}
         </p>
       </div>
       <Button

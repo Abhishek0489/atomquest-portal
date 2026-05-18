@@ -15,7 +15,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { TableSkeleton } from "@/components/shared/skeletons/TableSkeleton";
 
 type GoalWithCheckins = Goal & { checkins: Checkin[] };
 
@@ -54,12 +55,7 @@ export function EmployeeGoalsView({ employeeId }: { employeeId: string }) {
   }, [fetchDetail]);
 
   if (loading) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-[#64748B]">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading employee goals...
-      </p>
-    );
+    return <TableSkeleton rows={4} columns={5} />;
   }
 
   if (error || !data) {

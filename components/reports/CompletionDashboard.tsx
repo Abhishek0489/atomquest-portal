@@ -10,7 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Check, X, ClipboardList, Loader2 } from "lucide-react";
+import { Check, X, ClipboardList } from "lucide-react";
+import { TableSkeleton } from "@/components/shared/skeletons/TableSkeleton";
 type EmployeeCompletion = {
   id: string;
   name: string;
@@ -75,12 +76,7 @@ export function CompletionDashboard() {
   }, [fetchReport]);
 
   if (loading) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-[#64748B]">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading completion dashboard...
-      </p>
-    );
+    return <TableSkeleton rows={5} columns={7} />;
   }
 
   if (error) {

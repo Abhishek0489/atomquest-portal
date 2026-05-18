@@ -7,18 +7,15 @@ import { WeightageBar } from "@/components/goals/WeightageBar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MAX_GOALS_PER_CYCLE } from "@/lib/goal-validation";
-import { Loader2, Plus } from "lucide-react";
+import { Plus, Target } from "lucide-react";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { GoalListSkeleton } from "@/components/shared/skeletons/GoalListSkeleton";
 
 export function GoalList() {
   const { data, loading, error } = useGoals();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-16 text-[#64748B]">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        Loading goals…
-      </div>
-    );
+    return <GoalListSkeleton />;
   }
 
   if (error) {
@@ -80,18 +77,24 @@ export function GoalList() {
       <WeightageBar total={totalWeightage} />
 
       {goals.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
-          <p className="text-sm text-[#64748B]">No goals yet. Create your first goal.</p>
+        <div className="space-y-4">
+          <EmptyState
+            icon={Target}
+            title="No goals yet"
+            description="Create your first goal for this cycle to get started."
+          />
           {canCreate && (
-            <Link
-              href="/employee/goals/new"
-              className={cn(
-                buttonVariants(),
-                "mt-4 inline-flex bg-[#1E40AF] text-white hover:bg-[#1E40AF]/90"
-              )}
-            >
-              Create goal
-            </Link>
+            <div className="flex justify-center">
+              <Link
+                href="/employee/goals/new"
+                className={cn(
+                  buttonVariants(),
+                  "bg-[#1E40AF] text-white hover:bg-[#1E40AF]/90"
+                )}
+              >
+                Create goal
+              </Link>
+            </div>
           )}
         </div>
       ) : (

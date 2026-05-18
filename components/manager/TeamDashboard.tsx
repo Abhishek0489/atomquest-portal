@@ -5,18 +5,14 @@ import { useManagerTeam } from "@/hooks/useManagerTeam";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Users, Loader2, ChevronRight } from "lucide-react";
+import { Users, ChevronRight } from "lucide-react";
+import { CardGridSkeleton } from "@/components/shared/skeletons/CardGridSkeleton";
 
 export function TeamDashboard() {
   const { data, loading, error } = useManagerTeam();
 
   if (loading) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-[#64748B]">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading team...
-      </p>
-    );
+    return <CardGridSkeleton count={4} columns={2} />;
   }
 
   if (error) {

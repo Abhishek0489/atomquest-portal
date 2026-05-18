@@ -19,7 +19,10 @@ import { useDependencies } from "@/hooks/useDependencies";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { layoutGraph } from "@/lib/graph-layout";
-import { Loader2, Trash2 } from "lucide-react";
+import { GitBranch, Loader2, Trash2 } from "lucide-react";
+import { toast } from "@/lib/toast";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const nodeTypes = { goal: GoalNode };
 
@@ -85,15 +88,16 @@ export function DependencyGraph() {
         if (!res.ok) {
           throw new Error(body.error || "Failed to add dependency");
         }
-        setActionSuccess("Dependency added.");
+        toast.success("Dependency added");
         setDependentId("");
         setRequiredId("");
         await refetch();
         return true;
       } catch (e) {
-        setActionError(
-          e instanceof Error ? e.message : "Failed to add dependency"
-        );
+        const msg =
+          e instanceof Error ? e.message : "Failed to add dependency";
+        setActionError(msg);
+        toast.error(msg);
         return false;
       } finally {
         setSubmitting(false);
@@ -143,11 +147,13 @@ export function DependencyGraph() {
         if (!res.ok) {
           throw new Error(body.error || "Failed to remove dependency");
         }
+        toast.success("Dependency removed");
         await refetch();
       } catch (e) {
-        setActionError(
-          e instanceof Error ? e.message : "Failed to remove dependency"
-        );
+        const msg =
+          e instanceof Error ? e.message : "Failed to remove dependency";
+        setActionError(msg);
+        toast.error(msg);
       }
     },
     [refetch]
@@ -274,18 +280,22 @@ export function DependencyGraph() {
 
         <section className="h-[520px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           {loading && (
-            <p className="flex h-full items-center justify-center gap-2 text-sm text-[#64748B]">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              Loading graph…
-            </p>
+            <div className="flex h-full flex-col gap-4 p-6">
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="flex-1 w-full" />
+            </div>
           )}
           {error && (
             <p className="p-4 text-sm text-red-700">{error}</p>
           )}
           {!loading && !error && goals.length === 0 && (
-            <p className="flex h-full items-center justify-center text-sm text-[#64748B]">
-              Add goals first to build a dependency graph.
-            </p>
+            <div className="flex h-full items-center justify-center p-6">
+              <EmptyState
+                icon={GitBranch}
+                title="No goals to map"
+                description="Create goals for this cycle, then link dependencies here."
+              />
+            </div>
           )}
           {!loading && goals.length > 0 && (
             <ReactFlow

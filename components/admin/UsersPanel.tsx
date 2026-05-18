@@ -22,7 +22,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Users, Loader2, Plus, Pencil } from "lucide-react";
+import { Users, Plus, Pencil } from "lucide-react";
+import { toast } from "@/lib/toast";
+import { TableSkeleton } from "@/components/shared/skeletons/TableSkeleton";
 
 const ROLES: Role[] = ["EMPLOYEE", "MANAGER", "ADMIN"];
 
@@ -62,9 +64,12 @@ export function UsersPanel() {
         throw new Error(data.error || "Failed to create user");
       }
       setAddOpen(false);
+      toast.success("User created");
       refetch();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Failed to create user");
+      const msg = err instanceof Error ? err.message : "Failed to create user";
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -97,21 +102,19 @@ export function UsersPanel() {
         throw new Error(data.error || "Failed to update user");
       }
       setEditUser(null);
+      toast.success("User updated");
       refetch();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Failed to update user");
+      const msg = err instanceof Error ? err.message : "Failed to update user";
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
   }
 
   if (loading) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-[#64748B]">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading users...
-      </p>
-    );
+    return <TableSkeleton rows={5} columns={5} />;
   }
 
   if (error) {

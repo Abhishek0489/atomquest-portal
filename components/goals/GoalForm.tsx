@@ -23,6 +23,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Loader2, Save, Send } from "lucide-react";
+import { toast } from "@/lib/toast";
 
 type GoalFormProps = {
   goal?: Goal;
@@ -64,6 +65,8 @@ export function GoalForm({
   } = useForm<GoalFormValues>({
     resolver: zodResolver(goalFormSchema),
     defaultValues: toFormDefaults(goal),
+    mode: "onSubmit",
+    reValidateMode: "onChange",
   });
 
   const uomType = watch("uomType");
@@ -100,9 +103,13 @@ export function GoalForm({
           ? body.error
           : "Failed to save goal";
       setError("root", { message });
+      toast.error(message);
       return false;
     }
 
+    toast.success(
+      submitForApproval ? "Goal submitted for approval" : "Goal saved as draft"
+    );
     router.push("/employee/goals");
     router.refresh();
     return true;

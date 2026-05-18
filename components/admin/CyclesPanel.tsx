@@ -23,7 +23,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Calendar, Loader2, Plus } from "lucide-react";
+import { Calendar, Plus } from "lucide-react";
+import { toast } from "@/lib/toast";
+import { TableSkeleton } from "@/components/shared/skeletons/TableSkeleton";
 
 const PHASES = Object.keys(CYCLE_PHASE_LABELS) as CyclePhase[];
 
@@ -58,9 +60,12 @@ export function CyclesPanel() {
         throw new Error(data.error || "Failed to create cycle");
       }
       setCreateOpen(false);
+      toast.success("Cycle created");
       refetch();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Failed to create cycle");
+      const msg = err instanceof Error ? err.message : "Failed to create cycle";
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -78,21 +83,17 @@ export function CyclesPanel() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Failed to activate cycle");
       }
+      toast.success("Active cycle updated");
       refetch();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to activate cycle");
+      toast.error(err instanceof Error ? err.message : "Failed to activate cycle");
     } finally {
       setActivatingId(null);
     }
   }
 
   if (loading) {
-    return (
-      <p className="flex items-center gap-2 text-sm text-[#64748B]">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Loading cycles...
-      </p>
-    );
+    return <TableSkeleton rows={3} columns={6} />;
   }
 
   if (error) {

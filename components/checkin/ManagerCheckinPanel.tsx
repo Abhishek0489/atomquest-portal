@@ -5,7 +5,8 @@ import { useCheckins } from "@/hooks/useCheckins";
 import { CheckinComment } from "@/components/checkin/CheckinComment";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Label } from "@/components/ui/label";
-import { ClipboardCheck, Loader2 } from "lucide-react";
+import { ClipboardCheck } from "lucide-react";
+import { CardGridSkeleton } from "@/components/shared/skeletons/CardGridSkeleton";
 
 export function ManagerCheckinPanel() {
   const [employeeFilter, setEmployeeFilter] = useState("");
@@ -46,12 +47,7 @@ export function ManagerCheckinPanel() {
         </section>
       </section>
 
-      {loading && (
-        <p className="flex items-center gap-2 text-sm text-[#64748B]">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          Loading check-ins...
-        </p>
-      )}
+      {loading && <CardGridSkeleton count={2} columns={1} />}
 
       {error && (
         <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
