@@ -50,3 +50,11 @@ export type GoalFormValues = z.infer<typeof goalFormSchema>;
 
 export const goalCreateSchema = goalFormSchema;
 export const goalUpdateSchema = goalFormSchema;
+
+export const bulkActionSchema = z.object({
+  goalIds: z.array(z.string().min(1)).min(1, "Select at least one goal"),
+  action: z.enum(["APPROVE", "RETURN"]),
+  comment: z.string().max(1000).optional(),
+});
+
+export type BulkActionInput = z.infer<typeof bulkActionSchema>;
