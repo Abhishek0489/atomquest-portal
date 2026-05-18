@@ -2,6 +2,7 @@ import type { NextAuthConfig } from "next-auth";
 import type { Role } from "@prisma/client";
 
 export const authConfig = {
+  trustHost: true,
   providers: [],
   pages: {
     signIn: "/login",
@@ -17,6 +18,10 @@ export const authConfig = {
 
       const publicPaths = ["/login", "/unauthorized"];
       if (publicPaths.some((p) => pathname === p)) {
+        return true;
+      }
+
+      if (pathname.startsWith("/api/auth")) {
         return true;
       }
 

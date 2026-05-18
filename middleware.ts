@@ -29,6 +29,11 @@ export default auth((req) => {
   const isLoggedIn = !!session?.user;
   const role = session?.user?.role;
 
+  // NextAuth must receive JSON from /api/auth/* — never redirect these to /login
+  if (pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
   if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     if (pathname === "/login" && isLoggedIn && role) {
       return NextResponse.redirect(new URL(getRoleHome(role), req.url));

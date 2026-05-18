@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,9 +9,8 @@ import { loginSchema, type LoginFormValues } from "@/lib/validations/auth.schema
 import { getRoleHome } from "@/lib/role-utils";
 import type { DemoAccount } from "@/lib/constants/demo-accounts";
 import { DemoCredentialCards } from "@/components/layout/DemoCredentialCards";
+import { LoginField } from "@/components/layout/LoginField";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -24,11 +23,17 @@ import { Loader2, LogIn } from "lucide-react";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl");
+  const rawCallback = searchParams.get("callbackUrl");
+  const callbackUrl =
+    rawCallback &&
+    !rawCallback.startsWith("/api/auth") &&
+    rawCallback !== "/login"
+      ? rawCallback
+      : null;
   const [authError, setAuthError] = useState<string | null>(null);
+  const [fieldPulse, setFieldPulse] = useState(false);
 
   const {
-    register,
     handleSubmit,
     setValue,
     watch,
@@ -38,12 +43,37 @@ export function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
-  const selectedEmail = watch("email");
+  const email = watch("email");
+  const password = watch("password");
+  const selectedEmail = email;
+
+  function triggerPulse() {
+    setFieldPulse(true);
+    window.setTimeout(() => setFieldPulse(false), 600);
+  }
+
+  useEffect(() => {
+    const urlEmail = searchParams.get("email");
+    const urlPassword = searchParams.get("password");
+    if (urlEmail) {
+      setValue("email", urlEmail, { shouldValidate: true });
+    }
+    if (urlPassword) {
+      setValue("password", urlPassword, { shouldValidate: true });
+    }
+    if (urlEmail || urlPassword) {
+      triggerPulse();
+    }
+  }, [searchParams, setValue]);
 
   function handleDemoSelect(account: DemoAccount) {
-    setValue("email", account.email, { shouldValidate: true });
-    setValue("password", account.password, { shouldValidate: true });
+    setValue("email", account.email, { shouldValidate: true, shouldDirty: true });
+    setValue("password", account.password, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
     setAuthError(null);
+    triggerPulse();
   }
 
   async function onSubmit(data: LoginFormValues) {
@@ -88,38 +118,48 @@ export function LoginForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@atomquest.com"
-                autoComplete="email"
-                {...register("email")}
-                className={errors.email ? "border-red-500" : ""}
-              />
-              {errors.email && (
-                <p className="text-xs text-red-600">{errors.email.message}</p>
-              )}
-            </div>
+            <LoginField
+              id="email"
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(v) =>
+                setValue("email", v, { shouldValidate: true, shouldDirty: true })
+              }
+              onAutofill={(v) =>
+                setValue("email", v, { shouldValidate: true, shouldDirty: true })
+              }
+              placeholder="you@atomquest.com"
+              autoComplete="email"
+              error={errors.email?.message}
+              pulse={fieldPulse}
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                {...register("password")}
-                className={errors.password ? "border-red-500" : ""}
-              />
-              {errors.password && (
-                <p className="text-xs text-red-600">{errors.password.message}</p>
-              )}
-            </div>
+            <LoginField
+              id="password"
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(v) =>
+                setValue("password", v, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                })
+              }
+              onAutofill={(v) =>
+                setValue("password", v, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                })
+              }
+              placeholder="••••••••"
+              autoComplete="current-password"
+              error={errors.password?.message}
+              pulse={fieldPulse}
+            />
 
             {authError && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 border border-red-200">
+              <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
                 {authError}
               </p>
             )}
