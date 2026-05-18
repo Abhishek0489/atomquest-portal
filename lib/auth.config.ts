@@ -1,8 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
+import { getAuthSecret } from "@/lib/auth-secret";
 import type { AppRole } from "@/lib/roles";
 
 export const authConfig = {
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  secret: getAuthSecret(),
   trustHost: true,
   providers: [],
   pages: {
