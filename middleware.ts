@@ -1,17 +1,17 @@
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import type { Role } from "@prisma/client";
 import { authConfig } from "@/lib/auth.config";
+import type { AppRole } from "@/lib/roles";
 
 const { auth } = NextAuth(authConfig);
 
 const PUBLIC_PATHS = ["/login", "/unauthorized"];
 
-function hasRole(userRole: Role, allowed: Role[]): boolean {
+function hasRole(userRole: AppRole, allowed: AppRole[]): boolean {
   return allowed.includes(userRole);
 }
 
-function getRoleHome(role: Role): string {
+function getRoleHome(role: AppRole): string {
   switch (role) {
     case "ADMIN":
       return "/admin";

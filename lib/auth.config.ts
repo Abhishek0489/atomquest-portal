@@ -1,7 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
-import type { Role } from "@prisma/client";
+import type { AppRole } from "@/lib/roles";
 
 export const authConfig = {
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   trustHost: true,
   providers: [],
   pages: {
@@ -14,7 +15,7 @@ export const authConfig = {
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
       const isLoggedIn = !!auth?.user;
-      const role = auth?.user?.role as Role | undefined;
+      const role = auth?.user?.role as AppRole | undefined;
 
       const publicPaths = ["/login", "/unauthorized"];
       if (publicPaths.some((p) => pathname === p)) {
@@ -52,7 +53,7 @@ export const authConfig = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as Role;
+        session.user.role = token.role as AppRole;
         session.user.managerId = (token.managerId as string | null) ?? null;
       }
       return session;
